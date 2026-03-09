@@ -1,0 +1,59 @@
+
+services:
+
+  service-registry:
+    build: ./service-registry
+    container_name: service-registry
+    ports:
+      - "8761:8761"
+    networks:
+      - microservices-network
+
+  config-server:
+    build: ./config-server
+    container_name: config-server
+    ports:
+      - "8088:8088"
+    depends_on:
+      - service-registry
+    networks:
+      - microservices-network
+
+  customer-service:
+    build: ./customer-service
+    container_name: customer-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - service-registry
+      - config-server
+    networks:
+      - microservices-network
+
+  account-service:
+    build: ./account-service
+    container_name: account-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - service-registry
+      - config-server
+    networks:
+      - microservices-network
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8060:8060"
+    depends_on:
+      - service-registry
+      - config-server
+      - customer-service
+      - account-service
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
